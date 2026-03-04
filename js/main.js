@@ -63,7 +63,29 @@ Vue.component('card', {
             </div>
             <button @click="addNote">Добавить заметку</button>
         </div>
-    `
+    `,
+    methods: {
+        appendCardInFirstColumn() {
+
+        },
+
+        updateCard(changedData) {
+            const { columnIndex, cardId, field, value } = changedData;
+
+            let currentColumn;
+            switch (columnIndex) {
+                case 0:
+                    currentColumn = this.firstColumn;
+                    break;
+                case 1:
+                    currentColumn = this.secondColumn;
+                    break;
+                case 2:
+                    currentColumn = this.thirdColumn;
+                    break;
+            }
+        },
+    },
 })
 
 let app = new Vue({
@@ -71,6 +93,24 @@ let app = new Vue({
     data: {
     },
     methods: {
-    }
+        updateTitle(newTitle) {
+
+        },
+
+        updateNote(noteIndex, noteValue) {
+        },
+
+        addNote() {
+
+        },
+
+        removeNote(noteIndex) {
+
+        },
+
+        completeNote(noteIndex) {
+
+        }
+    },
 })
 
