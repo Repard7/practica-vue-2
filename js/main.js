@@ -3,7 +3,7 @@ Vue.component('product-notes', {
         return {
             firstColumn: [],
             secondColumn: [],
-            thirdColumn: [],
+            thirdColumn: []
         }
     },
     template: `
@@ -51,7 +51,8 @@ Vue.component('product-notes', {
                         { text: "Сделать дело1", completed: false },
                         { text: "Сделать дело2", completed: false },
                         { text: "Сделать дело3", completed: false }
-                    ]
+                    ],
+                    lastCompletedAt: null
                 }
                 this.firstColumn.push(card)
             }
@@ -128,7 +129,6 @@ Vue.component('product-notes', {
         }
     },
     watch: {
-        // Глубокое наблюдение за состоянием всех колонок
         allColumns: {
             deep: true,
             handler(newVal) {
@@ -174,6 +174,7 @@ Vue.component('card', {
                 <button @click="removeNote(id)" :disabled="note.completed || notesReachedMinimum || fulledSecondColumn && columnIndex==0" v-show="columnIndex!=2">Удалить</button>
             </div>
             <button @click="addNote" v-show="!notesExceededLimit && columnIndex!=2 && columnIndex!=1" :disabled="fulledSecondColumn && columnIndex==0">Добавить заметку</button>
+            <b v-show="columnIndex==2">{{formattedLastCompletedAt}}</b>
         </div>
     `,
     methods: {
@@ -228,6 +229,15 @@ Vue.component('card', {
                 field: 'listNotes',
                 value: newList
             });
+
+            const now = Date.now();
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'lastCompletedAt',
+                value: now
+            });
+
         }
     },
     computed: {
@@ -237,6 +247,10 @@ Vue.component('card', {
 
         notesReachedMinimum() {
             return this.card.listNotes.length <= 3;
+        },
+        formattedLastCompletedAt() {
+            if (!this.card.lastCompletedAt) return '';
+            return new Date(this.card.lastCompletedAt).toLocaleString();
         }
     }
 })
