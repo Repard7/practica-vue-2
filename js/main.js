@@ -8,18 +8,22 @@ Vue.component('product-notes', {
     },
     template: `
         <div class="product-notes">
-            <button class="appendCartButton">
+            <button class="appendCartButton" :disabled="fulledSecondColumn" @click="appendCardInFirstColumn">Добавить новую карточку</button>
+            <div class="columns">
                 <div class="column">
                     <h3>Меньше 50%</h3>
-                    <card v-for="card in firstColumn"></card>
+                    <card v-for="card in firstColumn" :key="card.id" :card-id="card.id" :column-index="0" @update-card="updateCard"
+                        :card="card" :fulledSecondColumn="fulledSecondColumn"></card>
                 </div>
                 <div class="column">
                     <h3>Больше 50% Но меньше 100%</h3>
-                    <card v-for="card in secondColumn"></card>
+                    <card v-for="card in secondColumn" :key="card.id" :card-id="card.id" :column-index="1" @update-card="updateCard"
+                        :card="card" :fulledSecondColumn="fulledSecondColumn"></card>
                 </div>
                 <div class="column">
                     <h3>Выполненные</h3>
-                    <card v-for="card in thirdColumn"></card>
+                    <card v-for="card in thirdColumn" :key="card.id" :card-id="card.id" :column-index="2" @update-card="updateCard"
+                        :card="card" :fulledSecondColumn="fulledSecondColumn"></card>
                 </div>
             </div>
         </div>
@@ -55,13 +59,13 @@ Vue.component('card', {
     },
     template: `
         <div class="card">
-            <input type="text" placeholder="Заголовок" :value="card.title" @input="updateTitle($event.target.value)">
+            <input type="text" placeholder="Заголовок" :value="card.title" @input="updateTitle($event.target.value)" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2">
             <div v-for="(note, id) in card.listNotes" :key="id">
-                <input type="text" placeholder="Заметка" :value="note.text">
-                <input type="checkbox" @change="completeNote(id)">
-                <button @click="removeNote(id)">Удалить</button>
+                <input type="text" placeholder="Заметка" :value="note.text" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2" @input="updateNote(id, $event.target.value)">
+                <input type="checkbox" @change="completeNote(id)" v-show="columnIndex!=2" :disabled="note.completed || fulledSecondColumn && columnIndex==0">
+                <button @click="removeNote(id)" :disabled="note.completed || notesReachedMinimum || fulledSecondColumn && columnIndex==0" v-show="columnIndex!=2">Удалить</button>
             </div>
-            <button @click="addNote">Добавить заметку</button>
+            <button @click="addNote" v-show="!notesExceededLimit && columnIndex!=2 && columnIndex!=1" :disabled="fulledSecondColumn && columnIndex==0">Добавить заметку</button>
         </div>
     `,
     methods: {
