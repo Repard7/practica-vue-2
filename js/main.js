@@ -66,7 +66,18 @@ Vue.component('card', {
     `,
     methods: {
         appendCardInFirstColumn() {
-
+            if (this.firstColumn.length < 3) {
+                const card = {
+                    id: Date.now() + Math.random(),
+                    title: null,
+                    listNotes: [
+                        { text: "Сделать дело1", completed: false },
+                        { text: "Сделать дело2", completed: false },
+                        { text: "Сделать дело3", completed: false }
+                    ]
+                }
+                this.firstColumn.push(card)
+            }
         },
 
         updateCard(changedData) {
@@ -84,6 +95,47 @@ Vue.component('card', {
                     currentColumn = this.thirdColumn;
                     break;
             }
+
+            const cardIndex = currentColumn.findIndex(c => c.id === cardId);
+
+            this.$set(currentColumn[cardIndex], field, value)
+
+            const card = currentColumn[cardIndex];
+            const total = card.listNotes.length;
+
+            const completedCount = card.listNotes.filter(note => note.completed).length;
+            const percent = (completedCount / total) * 100;
+
+            let targetColumnIndex;
+            if (percent < 50) {
+                targetColumnIndex = 0;
+            }
+            else if (percent < 100) {
+                if (this.fulledSecondColumn) {
+                    targetColumnIndex = columnIndex;
+                }
+                else {
+                    targetColumnIndex = 1;
+                }
+            }
+            else {
+                targetColumnIndex = 2;
+            }
+
+
+            if (columnIndex != targetColumnIndex) {
+
+                currentColumn.splice(cardIndex, 1)
+
+                let targetColumn;
+                switch (targetColumnIndex) {
+                    case 0: targetColumn = this.firstColumn; break;
+                    case 1: targetColumn = this.secondColumn; break;
+                    case 2: targetColumn = this.thirdColumn; break;
+                }
+
+                targetColumn.push(card)
+            }
         },
     },
 })
@@ -94,22 +146,56 @@ let app = new Vue({
     },
     methods: {
         updateTitle(newTitle) {
-
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'title',
+                value: newTitle
+            })
         },
 
         updateNote(noteIndex, noteValue) {
+            const newList = [...this.card.listNotes]
+            newList[noteIndex] = { text: noteValue, completed: this.card.listNotes[noteIndex].completed }
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'listNotes',
+                value: newList
+            })
         },
 
         addNote() {
-
+            if (this.card.listNotes.length >= 5) return;
+            const newList = [...this.card.listNotes, { text: '', completed: false }]
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'listNotes',
+                value: newList
+            })
         },
 
         removeNote(noteIndex) {
-
+            if (this.card.listNotes.length == 3) return;
+            const newList = this.card.listNotes.filter((item, index) => index !== noteIndex)
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'listNotes',
+                value: newList
+            })
         },
 
         completeNote(noteIndex) {
-
+            const newList = [...this.card.listNotes];
+            newList[noteIndex] = { ...newList[noteIndex], completed: true };
+            this.$emit('update-card', {
+                columnIndex: this.columnIndex,
+                cardId: this.cardId,
+                field: 'listNotes',
+                value: newList
+            });
         }
     },
 })
