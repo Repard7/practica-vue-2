@@ -28,6 +28,19 @@ Vue.component('product-notes', {
             </div>
         </div>
     `,
+    mounted() {
+        const saved = localStorage.getItem('product-notes-state');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                this.firstColumn = state.first || [];
+                this.secondColumn = state.second || [];
+                this.thirdColumn = state.third || [];
+            } catch (e) {
+                console.error('Ошибка загрузки состояния', e);
+            }
+        }
+    },
     methods: {
         appendCardInFirstColumn() {
             if (this.firstColumn.length < 3) {
@@ -105,6 +118,22 @@ Vue.component('product-notes', {
     computed: {
         fulledSecondColumn() {
             return this.secondColumn.length >= 5;
+        },
+        allColumns() {
+            return {
+                first: this.firstColumn,
+                second: this.secondColumn,
+                third: this.thirdColumn
+            };
+        }
+    },
+    watch: {
+        // Глубокое наблюдение за состоянием всех колонок
+        allColumns: {
+            deep: true,
+            handler(newVal) {
+                localStorage.setItem('product-notes-state', JSON.stringify(newVal));
+            }
         }
     }
 })
