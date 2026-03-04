@@ -138,6 +138,11 @@ Vue.component('card', {
             }
         },
     },
+    computed: {
+        fulledSecondColumn() {
+            return this.secondColumn.length >= 5;
+        }
+    }
 })
 
 let app = new Vue({
@@ -198,5 +203,14 @@ let app = new Vue({
             });
         }
     },
+    computed: {
+        notesExceededLimit() {
+            return this.card.listNotes.length >= 5;
+        },
+
+        notesReachedMinimum() {
+            return this.card.listNotes.length <= 3;
+        }
+    }
 })
 
