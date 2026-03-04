@@ -28,46 +28,6 @@ Vue.component('product-notes', {
             </div>
         </div>
     `,
-})
-
-Vue.component('card', {
-    props: {
-        cardId: {
-            type: [String, Number],
-            required: true
-        },
-
-        card: {
-            type: Object,
-            required: true
-        },
-
-        columnIndex: {
-            type: Number,
-            required: true
-        },
-
-        cardIndex: {
-            type: Number,
-            required: true
-        },
-
-        fulledSecondColumn: {
-            type: Boolean,
-            required: true
-        }
-    },
-    template: `
-        <div class="card">
-            <input type="text" placeholder="Заголовок" :value="card.title" @input="updateTitle($event.target.value)" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2">
-            <div v-for="(note, id) in card.listNotes" :key="id">
-                <input type="text" placeholder="Заметка" :value="note.text" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2" @input="updateNote(id, $event.target.value)">
-                <input type="checkbox" @change="completeNote(id)" v-show="columnIndex!=2" :disabled="note.completed || fulledSecondColumn && columnIndex==0">
-                <button @click="removeNote(id)" :disabled="note.completed || notesReachedMinimum || fulledSecondColumn && columnIndex==0" v-show="columnIndex!=2">Удалить</button>
-            </div>
-            <button @click="addNote" v-show="!notesExceededLimit && columnIndex!=2 && columnIndex!=1" :disabled="fulledSecondColumn && columnIndex==0">Добавить заметку</button>
-        </div>
-    `,
     methods: {
         appendCardInFirstColumn() {
             if (this.firstColumn.length < 3) {
@@ -149,10 +109,44 @@ Vue.component('card', {
     }
 })
 
-let app = new Vue({
-    el: '#app',
-    data: {
+Vue.component('card', {
+    props: {
+        cardId: {
+            type: [String, Number],
+            required: true
+        },
+
+        card: {
+            type: Object,
+            required: true
+        },
+
+        columnIndex: {
+            type: Number,
+            required: true
+        },
+
+        cardIndex: {
+            type: Number,
+            required: true
+        },
+
+        fulledSecondColumn: {
+            type: Boolean,
+            required: true
+        }
     },
+    template: `
+        <div class="card">
+            <input type="text" placeholder="Заголовок" :value="card.title" @input="updateTitle($event.target.value)" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2">
+            <div v-for="(note, id) in card.listNotes" :key="id">
+                <input type="text" placeholder="Заметка" :value="note.text" :disabled="fulledSecondColumn && columnIndex==0 || columnIndex==2" @input="updateNote(id, $event.target.value)">
+                <input type="checkbox" @change="completeNote(id)" v-show="columnIndex!=2" :disabled="note.completed || fulledSecondColumn && columnIndex==0">
+                <button @click="removeNote(id)" :disabled="note.completed || notesReachedMinimum || fulledSecondColumn && columnIndex==0" v-show="columnIndex!=2">Удалить</button>
+            </div>
+            <button @click="addNote" v-show="!notesExceededLimit && columnIndex!=2 && columnIndex!=1" :disabled="fulledSecondColumn && columnIndex==0">Добавить заметку</button>
+        </div>
+    `,
     methods: {
         updateTitle(newTitle) {
             this.$emit('update-card', {
@@ -218,3 +212,10 @@ let app = new Vue({
     }
 })
 
+let app = new Vue({
+    el: '#app',
+    data: {
+    },
+    methods: {
+    }
+})
